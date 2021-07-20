@@ -17,7 +17,7 @@ const port = 3000;
 
 
 app.use(express.static('public'));
-
+app.use(express.urlencoded());
 app.use(express.json());
 
 //Configures handlebars library to work well w/ Express + Sequelize model
@@ -47,6 +47,20 @@ app.get('/restaurants/:id', async (req, res) => {
         }
     });
     res.render('restaurant', { restaurant });
+});
+
+app.get('/new-restaurant-form', (req, res) => {
+    res.render('newRestaurantForm');
+});
+
+app.post('/new-restaurant', async (req, res) => {
+    const newRestaurant = await Restaurant.create(req.body);
+    const foundRestaurant = await Restaurant.findByPk(newRestaurant.id);
+    if(foundRestaurant) {
+        res.status(201).send('New restaurant created~')
+    } else {
+        console.log("Could not create restaurant~")
+    }
 });
 
 app.post('/restaurants', restaurantChecks, async (req, res) => {
